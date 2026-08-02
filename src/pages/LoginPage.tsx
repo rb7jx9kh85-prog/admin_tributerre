@@ -14,8 +14,18 @@ function authErrorMessage(code: string): string {
       return 'E-mail ou mot de passe incorrect.'
     case 'auth/too-many-requests':
       return 'Trop de tentatives. Réessayez plus tard.'
+    case 'auth/network-request-failed':
+      return 'Connexion réseau impossible. Vérifiez votre connexion.'
+    case 'auth/configuration-not-found':
+    case 'auth/operation-not-allowed':
+      return "La méthode e-mail/mot de passe n'est pas activée dans Firebase Authentication."
+    case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+    case 'auth/invalid-api-key':
+      return 'Configuration Firebase invalide (clé API). Vérifiez le fichier .env.'
+    case 'auth/unauthorized-domain':
+      return "Ce domaine n'est pas autorisé dans Firebase Authentication > Settings > Authorized domains."
     default:
-      return 'Impossible de se connecter. Réessayez.'
+      return `Impossible de se connecter (${code || 'erreur inconnue'}). Voir la console pour les détails.`
   }
 }
 
@@ -41,6 +51,7 @@ export function LoginPage() {
     try {
       await login(email.trim(), password)
     } catch (err) {
+      console.error('Firebase login error:', err)
       const code = (err as { code?: string }).code ?? ''
       setError(authErrorMessage(code))
     } finally {
